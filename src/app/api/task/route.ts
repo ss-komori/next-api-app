@@ -4,16 +4,16 @@ import { number, z } from "zod";
 
 export async function GET() {
   try {
-    const res = await fetch(`http://localhost/api/tasks`).then((res) =>
+    const res = await fetch(`http://backend:80/api/tasks`).then((res) =>
       res.json()
     );
     if (!res || Object.keys(res).length === 0) {
-      return NextResponse.json({}, { status: 500 });
+      return NextResponse.json([], { status: 500 });
     }
 
-    return NextResponse.json(res, { status: 200 });
+    return NextResponse.json(res, { status: 201 });
   } catch (error) {
-    return NextResponse.json({}, { status: 500 });
+    return NextResponse.json([], { status: 500 });
   }
 }
 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
   const task = result.task as Task;
 
-  const res = await fetch(`http://localhost/api/tasks`, {
+  const res = await fetch(`http://backend:80/api/tasks`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -30,8 +30,9 @@ export async function POST(request: NextRequest) {
       content: task.content,
       status: task.status,
     }),
-  });
+  }).then((res) => res.json());
 
+  console.log("res", res);
   return NextResponse.json(res, { status: 200 });
 }
 
@@ -39,7 +40,7 @@ export async function DELETE(request: NextRequest) {
   const result = await request.json();
   const id = result.id;
 
-  const res = await fetch(`http://localhost/api/tasks/${id}`, {
+  const res = await fetch(`http://backend:80/api/tasks/${id}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
   });
@@ -49,7 +50,7 @@ export async function PATCH(request: NextRequest) {
   const result = await request.json();
   const task = result.task as Task;
 
-  const res = await fetch(`http://localhost/api/tasks/${task.id}`, {
+  const res = await fetch(`http://backend:80/api/tasks/${task.id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
